@@ -5,6 +5,7 @@
 XONICLI - SISTEMA METEOROLOGICO EN TERMINAL
 Con animacion continua de la Tierra y datos climáticos simultáneos.
 Sin emojis, secuencia cada 10 segundos, cache en disco.
+AMbos modos (recurrente y unica vez) ahora son bucles infinitos.
 """
 
 import requests
@@ -38,7 +39,7 @@ def print_color(*args, sep=' ', end='\n'):
     print(f"{color_actual}{texto}{RESET}", end=end)
 
 # ============================================================================
-# GENERACION DE LA TIERRA ASCII (corregida)
+# GENERACION DE LA TIERRA ASCII
 # ============================================================================
 def generar_tierra(angle, width=40, height=20):
     """Genera una matriz de caracteres para la Tierra girando."""
@@ -55,14 +56,12 @@ def generar_tierra(angle, width=40, height=20):
             ny = y / radius
             dist2 = nx*nx + ny*ny
             if dist2 <= 1:
-                # Evitar errores de redondeo en sqrt
                 nz = math.sqrt(max(0, 1 - dist2))
                 lon = math.atan2(nx, nz) + angle
                 lat = math.asin(ny)
                 tex = math.sin(3*lon) + math.cos(5*lat) + math.sin(8*(lon+lat))
                 light = nx*0.3 + ny*-0.4 + nz*0.8
                 val = tex + light*2
-                # Clampear val al rango [-3, 3] (teórico) y luego mapear
                 val_clamped = max(-3, min(3, val))
                 idx = int(((val_clamped + 3) / 6) * (len(chars) - 1))
                 idx = max(0, min(len(chars)-1, idx))
@@ -191,11 +190,13 @@ def formatear_datos(datos, idx_dia):
 
 # ============================================================================
 # BUCLE PRINCIPAL CON ANIMACION SIMULTANEA
+# AHORA AMBOS MODOS SON CICLICOS INFINITOS
 # ============================================================================
-def run_con_animacion(todos_datos, es_recurrente=False):
+def run_con_animacion(todos_datos):
     """
     Bucle principal: dibuja la Tierra girando y los datos actuales.
     Los datos cambian cada 10 segundos según secuencia.
+    Siempre se ejecuta en bucle infinito (hasta Ctrl+C).
     """
     # Determinar secuencia de (datos, idx_dia)
     max_dias = 3
@@ -232,24 +233,19 @@ def run_con_animacion(todos_datos, es_recurrente=False):
     
     angle = 0
     try:
-        while True:
+        while True:  # Bucle infinito, se sale solo con Ctrl+C
             start_frame = time.time()
             
-            # Verificar si toca cambiar de dia
+            # Verificar si toca cambiar de dia (cada 10 segundos)
             ahora = time.time()
             if ahora - ultimo_cambio >= intervalo:
-                idx_secuencia = (idx_secuencia + 1) % len(secuencia) if es_recurrente else idx_secuencia + 1
+                # Avanzar al siguiente día de forma cíclica (siempre módulo)
+                idx_secuencia = (idx_secuencia + 1) % len(secuencia)
                 ultimo_cambio = ahora
-                # Si modo unica vez y terminamos, salir
-                if not es_recurrente and idx_secuencia >= len(secuencia):
-                    break
             
             # Obtener datos actuales a mostrar
-            if idx_secuencia < len(secuencia):
-                datos_actuales, dia_actual = secuencia[idx_secuencia]
-                lineas_datos = formatear_datos(datos_actuales, dia_actual)
-            else:
-                lineas_datos = ["[FIN DEL CICLO]"]
+            datos_actuales, dia_actual = secuencia[idx_secuencia]
+            lineas_datos = formatear_datos(datos_actuales, dia_actual)
             
             # Generar la Tierra en el frame actual
             tierra = generar_tierra(angle, width=ancho_tierra, height=alto_tierra)
@@ -283,12 +279,10 @@ def run_con_animacion(todos_datos, es_recurrente=False):
     except KeyboardInterrupt:
         pass
     except Exception as e:
-        # Capturar cualquier otro error para no romper la terminal
         sys.stdout.write('\033[?25h')
         sys.stdout.flush()
         print_color(f"\n[ERROR interno] {e}")
     finally:
-        # Restaurar cursor y limpiar pantalla
         sys.stdout.write('\033[?25h')
         sys.stdout.flush()
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -344,13 +338,12 @@ def preguntar_ubicaciones():
 def preguntar_modo():
     print("\n[MODO DE CONEXION]")
     print("  1. Tiempo real recurrente (bucle infinito, 10s entre cada dia)")
-    print("  2. Una sola vez (muestra ciclo completo y termina)")
+    print("  2. Una sola vez (tambien bucle infinito, usa datos cacheados)")
+    print("   (Ambos modos se ejecutan hasta Ctrl+C, solo cambia si descargan nuevos datos)")
     while True:
         op = input("Elige (1/2): ").strip()
-        if op == "1":
-            return "recurrente"
-        elif op == "2":
-            return "unica"
+        if op == "1" or op == "2":
+            return op
         else:
             print("Responde 1 o 2.")
 
@@ -381,11 +374,20 @@ def main():
         save_cache(ubicaciones, todos_datos)
         print("[OK] Datos guardados en cache.")
     
-    # Pausa breve antes de iniciar animacion
+    # Si el usuario eligió modo 2 (unica vez), no hacemos nada diferente,
+    # simplemente ejecutamos el bucle (que ya es infinito).
+    # Opcional: si se quisiera que el modo 1 volviera a descargar periódicamente,
+    # habría que implementar otra lógica, pero por simplicidad ambos usan cache.
+    # El mensaje de inicio puede variar.
+    if modo == "2":
+        print("\n[EJECUTANDO EN MODO 'UNA SOLA VEZ' - Bucle infinito hasta Ctrl+C]")
+    else:
+        print("\n[EJECUTANDO EN MODO RECURRENTE - Bucle infinito hasta Ctrl+C]")
+    
     time.sleep(1)
     
     # Ejecutar con animacion simultanea
-    run_con_animacion(todos_datos, es_recurrente=(modo == "recurrente"))
+    run_con_animacion(todos_datos)
 
 if __name__ == "__main__":
     try:
