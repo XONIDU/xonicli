@@ -28,7 +28,7 @@ Desarrollado por Darian Alberto Camacho Salas – XONIDU
 git clone https://github.com/XONIDU/xonicli.git
 cd xonicli
 pip install -r requirements.txt   # o solo pip install requests
-python start_weather.py           # o ./start_weather.py
+python start.py
 ```
 
 ### Opción 2 – Comando `xoninstall` (recomendado para futuras herramientas XONI)
@@ -45,7 +45,7 @@ Luego simplemente escribe:
 xoninstall xonicli
 cd xonicli
 pip install -r requirements.txt
-python start_weather.py
+python start.py
 ```
 
 > **Nota:** Esta función te servirá para instalar cualquier otra herramienta futura de XONIDU (por ejemplo `xoninstall xoniran`).
@@ -54,7 +54,7 @@ python start_weather.py
 
 ## 🔧 Configuración
 
-La primera vez que ejecutes `start_weather.py` se abrirá un gestor interactivo donde podrás:
+La primera vez que ejecutes `start.py` se abrirá un gestor interactivo donde podrás:
 
 - Elegir el color del texto (0‑9)
 - Agregar una o varias ubicaciones (código postal + país)
@@ -86,7 +86,7 @@ Solo se descargan una vez (la primera ejecución). En ejecuciones posteriores se
 ## 🚀 Uso
 
 ```bash
-python start_weather.py   # o ./start_weather.py
+python start.py
 ```
 
 Dentro del programa:
@@ -118,7 +118,7 @@ Dentro del programa:
 | Archivo | Ubicación |
 |---------|-----------|
 | `xonicli.py` (programa principal) | `/usr/share/xonicli/` o donde se clonó |
-| `start_weather.py` (lanzador) | mismo directorio |
+| `start.py` (lanzador) | mismo directorio |
 | `ubicaciones.txt` | `~/.xonichat/ubicaciones.txt` |
 | `weather_cache.json` | `~/.xonichat/weather_cache.json` |
 
@@ -144,7 +144,7 @@ Si todo funciona correctamente, verás la animación de la Tierra y los datos de
 | Error `expected a nonnegative input` | Ya corregido en la última versión. Asegúrate de tener la versión más reciente. |
 | La animación parpadea | Aumenta el tamaño de la terminal (mínimo 80x24). |
 | No se ven datos | En la primera ejecución se necesita internet. Luego ya funciona sin conexión. |
-| `Permission denied` al ejecutar | Usa `python start_weather.py` en lugar de `./` o da permisos con `chmod +x`. |
+| `Permission denied` al ejecutar | Usa `python start.py` en lugar de `./` o da permisos con `chmod +x`. |
 
 ---
 
@@ -160,8 +160,3 @@ Todos los derechos reservados. No se permite la copia, distribución o modificac
 - **Creador**: Darian Alberto Camacho Salas  
 - **Email**: xonidu@gmail.com  
 - **GitHub**: [@XONIDU](https://github.com/XONIDU)
-
----
-
-*Hecho con 🌍 y código para los amantes de la terminal.*
-
