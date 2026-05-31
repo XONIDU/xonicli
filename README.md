@@ -44,11 +44,11 @@ Luego simplemente escribe:
 ```bash
 xoninstall xonicli
 cd xonicli
-pip install -r requirements.txt
+pip install -r requisitos.txt
 python start.py
 ```
 
-> **Nota:** Esta función te servirá para instalar cualquier otra herramienta futura de XONIDU (por ejemplo `xoninstall xoniran`).
+> **Nota:** Esta función te servirá para instalar cualquier otra herramienta futura de XONIDU (por ejemplo `xoninstall xonicli`).
 
 ---
 
