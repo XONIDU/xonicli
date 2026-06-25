@@ -17,12 +17,15 @@ Desarrollado por Darian Alberto Camacho Salas – XONIDU
 - ✅ Gestor interactivo de ubicaciones – sin editar archivos manualmente
 - ✅ Sin `sudo` – los archivos se guardan en `~/.xonichat/`
 - ✅ Colores personalizables (0‑9) en toda la interfaz
+- ✅ Compatible con Windows, Linux y macOS
 
 ---
 
 ## 📦 Instalación
 
-### Opción 1 – Clonado manual
+### Para Linux/macOS
+
+#### Opción 1 – Clonado manual
 
 ```bash
 git clone https://github.com/XONIDU/xonicli.git
@@ -31,7 +34,7 @@ pip install -r requirements.txt   # o solo pip install requests
 python start.py
 ```
 
-### Opción 2 – Comando `xoninstall` (recomendado para futuras herramientas XONI)
+#### Opción 2 – Comando `xoninstall` (recomendado para futuras herramientas XONI)
 
 Agrega la siguiente función a tu `~/.bashrc` con un solo comando:
 
@@ -44,11 +47,79 @@ Luego simplemente escribe:
 ```bash
 xoninstall xonicli
 cd xonicli
-pip install -r requisitos.txt
+pip install -r requirements.txt
 python start.py
 ```
 
-> **Nota:** Esta función te servirá para instalar cualquier otra herramienta futura de XONIDU (por ejemplo `xoninstall xonicli`).
+> **Nota:** Esta función te servirá para instalar cualquier otra herramienta futura de XONIDU (por ejemplo `xoninstall xoniran`).
+
+### Para Windows
+
+#### Opción 1 – Clonado manual (PowerShell o CMD)
+
+```cmd
+git clone https://github.com/XONIDU/xonicli.git
+cd xonicli
+pip install -r requirements.txt
+python start.py
+```
+
+#### Opción 2 – Usar `xonicli.bat` (con permisos de administrador)
+
+Descarga o crea el archivo `xonicli.bat` en el mismo directorio con el siguiente contenido:
+
+```batch
+@echo off
+title XONICLI 2026 - Sistema Meteorologico
+color 0A
+
+:: ============================================================
+:: SOLICITAR PERMISOS DE ADMINISTRADOR
+:: ============================================================
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Solicitando permisos de administrador...
+    echo.
+    echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
+    echo UAC.ShellExecute "%~s0", "", "", "runas", 1 >> "%temp%\getadmin.vbs"
+    "%temp%\getadmin.vbs"
+    del "%temp%\getadmin.vbs"
+    exit /B
+)
+
+:: ============================================================
+:: EJECUTAR start.py CON PERMISOS DE ADMINISTRADOR
+:: ============================================================
+cls
+echo ============================================================
+echo           XONICLI 2026 - Sistema Meteorologico
+echo              (Modo Administrador)
+echo ============================================================
+echo.
+echo [OK] Permisos de administrador obtenidos
+echo.
+echo Iniciando XONICLI...
+echo.
+echo [INFO] Sistema meteorologico con animacion de la Tierra
+echo [INFO] Presiona Ctrl+C para salir
+echo.
+echo ============================================================
+echo.
+
+python start.py
+
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Ocurrio un error al ejecutar start.py
+    echo.
+    echo Verifica que start.py y xonicli.py esten en el mismo directorio
+    echo.
+)
+
+pause
+```
+
+Haz doble clic en `xonicli.bat` para ejecutar XONICLI con permisos de administrador en Windows.
 
 ---
 
@@ -65,7 +136,8 @@ La primera vez que ejecutes `start.py` se abrirá un gestor interactivo donde po
 Si prefieres editar directamente el archivo, se encuentra en:
 
 ```
-~/.xonichat/ubicaciones.txt
+~/.xonichat/ubicaciones.txt   (Linux/macOS)
+%USERPROFILE%\.xonichat\ubicaciones.txt   (Windows)
 ```
 
 Formato (una ubicación por línea, **código postal** y **país** separados por espacio):
@@ -85,9 +157,14 @@ Solo se descargan una vez (la primera ejecución). En ejecuciones posteriores se
 
 ## 🚀 Uso
 
+### Linux/macOS:
 ```bash
 python start.py
 ```
+
+### Windows:
+- Opción 1: `python start.py` (CMD o PowerShell)
+- Opción 2: Doble clic en `xonicli.bat`
 
 Dentro del programa:
 
@@ -117,10 +194,11 @@ Dentro del programa:
 
 | Archivo | Ubicación |
 |---------|-----------|
-| `xonicli.py` (programa principal) | `/usr/share/xonicli/` o donde se clonó |
-| `start.py` (lanzador) | mismo directorio |
-| `ubicaciones.txt` | `~/.xonichat/ubicaciones.txt` |
-| `weather_cache.json` | `~/.xonichat/weather_cache.json` |
+| `xonicli.py` (programa principal) | Directorio del proyecto |
+| `start.py` (lanzador) | Directorio del proyecto |
+| `xonicli.bat` (lanzador Windows) | Directorio del proyecto |
+| `ubicaciones.txt` | `~/.xonichat/` (Linux) o `%USERPROFILE%\.xonichat\` (Windows) |
+| `weather_cache.json` | `~/.xonichat/` (Linux) o `%USERPROFILE%\.xonichat\` (Windows) |
 
 ---
 
@@ -144,7 +222,8 @@ Si todo funciona correctamente, verás la animación de la Tierra y los datos de
 | Error `expected a nonnegative input` | Ya corregido en la última versión. Asegúrate de tener la versión más reciente. |
 | La animación parpadea | Aumenta el tamaño de la terminal (mínimo 80x24). |
 | No se ven datos | En la primera ejecución se necesita internet. Luego ya funciona sin conexión. |
-| `Permission denied` al ejecutar | Usa `python start.py` en lugar de `./` o da permisos con `chmod +x`. |
+| `Permission denied` al ejecutar (Linux) | Usa `python start.py` en lugar de `./` o da permisos con `chmod +x start.py` |
+| Error de permisos en Windows | Usa `xonicli.bat` que ejecuta con permisos de administrador |
 
 ---
 
@@ -160,3 +239,7 @@ Todos los derechos reservados. No se permite la copia, distribución o modificac
 - **Creador**: Darian Alberto Camacho Salas  
 - **Email**: xonidu@gmail.com  
 - **GitHub**: [@XONIDU](https://github.com/XONIDU)
+
+---
+
+*Hecho con 🌍 y código para los amantes de la terminal.*
