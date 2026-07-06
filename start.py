@@ -401,7 +401,7 @@ def main():
     
     # Cambiar al directorio y ejecutar
     os.chdir(xonicli_dir)
-    print(f"\n{Colors.BOLD}🌍 Iniciando XONICLI...{Colors.END}")
+    print(f"\n{Colors.BOLD}Iniciando XONICLI...{Colors.END}")
     print(f"{Colors.CYAN}Para salir: presiona Ctrl+C en cualquier momento{Colors.END}")
     print("-"*50)
     
@@ -409,7 +409,7 @@ def main():
         python_cmd = get_python_command()
         subprocess.run(python_cmd + [ruta_xonicli])
     except KeyboardInterrupt:
-        print(f"\n{Colors.YELLOW}🛑 Programa detenido por el usuario.{Colors.END}")
+        print(f"\n{Colors.YELLOW}Programa detenido por el usuario.{Colors.END}")
     except Exception as e:
         print(f"\n{Colors.RED}❌ Error: {e}{Colors.END}")
     
