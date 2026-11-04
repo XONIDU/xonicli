@@ -1,100 +1,109 @@
-# 🌍 XONICLI
+```markdown
+# MONITOR WEB
 
-**Cliente meteorológico por terminal con animación ASCII de la Tierra**  
+**Monitor multiuso de terminal y escritorio: clima con animacion ASCII o paneles web en cuadricula**  
 Optimizado para equipos de bajos recursos (ASUS Eee PC, Raspberry Pi, etc.)  
-Desarrollado por Darian Alberto Camacho Salas – XONIDU
+Desarrollado por Darian Alberto Camacho Salas — XONIDU
 
 ---
 
-## 📋 Características
+## Descripcion general
 
-- ✅ Interfaz 100% terminal – rápida y ligera
-- ✅ Tierra animada girando en tiempo real junto a los datos
-- ✅ Múltiples ubicaciones (país + código postal)
-- ✅ Datos en caché: solo una descarga por internet (modo sin conexión después)
-- ✅ Secuencia automática: hoy → mañana → pasado mañana (cada 10 segundos)
-- ✅ Dos modos: recurrente (bucle infinito) o consulta única (también con bucle)
-- ✅ Gestor interactivo de ubicaciones – sin editar archivos manualmente
-- ✅ Sin `sudo` – los archivos se guardan en `~/.xonichat/`
-- ✅ Colores personalizables (0‑9) en toda la interfaz
-- ✅ Compatible con Windows, Linux y macOS
+MONITOR WEB es una aplicacion que reúne dos herramientas en un solo lanzador:
+
+1. **CLI (terminal)**: monitor meteorologico con animacion ASCII de la Tierra, multiples ubicaciones y cache local.
+2. **UI (escritorio)**: visor de multiples paginas web en una cuadricula, con refresco automatico por panel, maximizacion y configuracion persistente.
+
+El lanzador `start.py` detecta el sistema, verifica Python y pip, instala las dependencias necesarias segun el modo elegido (PyQt6 para la UI, `requests` + `beautifulsoup4` para el CLI) y ejecuta el programa correspondiente.
 
 ---
 
-## 📦 Instalación
+## Caracteristicas
 
-### Para Linux/macOS
+### Modo CLI — Clima en terminal
 
-#### Opción 1 – Clonado manual
+| Caracteristica | Descripcion |
+|----------------|-------------|
+| Interfaz 100% terminal | Sin dependencias de escritorio |
+| Animacion ASCII de la Tierra | Representacion continua del planeta junto a los datos |
+| Multiples ubicaciones | Varias ubicaciones (pais + codigo postal) |
+| Cache local | Los datos se descargan una sola vez y se reutilizan sin conexion |
+| Secuencia automatica | Recorre hoy, manana y pasado manana cada 10 segundos |
+| Bucle infinito | Ambos modos (recurrente y unica vez) se ejecutan hasta `Ctrl+C` |
+| Colores personalizables | Seleccion de color de texto (0-9) |
+
+### Modo UI — Paneles web en escritorio
+
+| Caracteristica | Descripcion |
+|----------------|-------------|
+| Cuadricula de paneles | Varias webs visibles a la vez |
+| Refresco automatico | Configurable por panel (minutos) |
+| Maximizar panel | Vista individual a pantalla completa |
+| Edicion de URL/titulo | Desde el propio panel |
+| Perfil persistente | Cookies y sesion conservadas entre ejecuciones |
+| Atajos de teclado | `Ctrl+N` agregar, `F5` recargar, `F11` pantalla completa |
+
+---
+
+## Requisitos
+
+- Python 3.8 o superior
+- **CLI**: `requests` y `beautifulsoup4` (se instalan automaticamente)
+- **UI**: `PyQt6` y `PyQt6-WebEngine` (se instalan automaticamente)
+- Conexion a internet para la primera descarga de datos (CLI) o para cargar las webs (UI)
+
+---
+
+## Instalacion
+
+### Linux y macOS
+
+**Metodo 1: clonado manual**
 
 ```bash
-git clone https://github.com/XONIDU/xonicli.git
-cd xonicli
-pip install -r requirements.txt   # o solo pip install requests
+git clone https://github.com/XONIDU/monitor-web.git
+cd monitor-web
+pip install -r requirements.txt   # opcional, start.py lo hace por ti
 python start.py
 ```
 
-#### Opción 2 – Comando `xoninstall` (recomendado para futuras herramientas XONI)
+**Metodo 2: comando `xoninstall` (recomendado para herramientas XONI)**
 
-Agrega la siguiente función a tu `~/.bashrc` con un solo comando:
+Anade la siguiente funcion a tu archivo `~/.bashrc`:
 
 ```bash
-echo 'xoninstall() { if [ -z "$1" ]; then echo "Uso: xoninstall <repo>"; echo "Ej: xoninstall xoniran"; else git clone "https://github.com/XONIDU/$1.git"; fi; }' >> ~/.bashrc && source ~/.bashrc && echo "✅ Listo. Usa: xoninstall xonicli"
+echo 'xoninstall() { if [ -z "$1" ]; then echo "Uso: xoninstall <repo>"; echo "Ej: xoninstall xoniran"; else git clone "https://github.com/XONIDU/$1.git"; fi; }' >> ~/.bashrc && source ~/.bashrc && echo "Listo. Usa: xoninstall monitor-web"
 ```
 
-Luego simplemente escribe:
+Despues, instala y ejecuta:
 
 ```bash
-xoninstall xonicli
-cd xonicli
-pip install -r requirements.txt
+xoninstall monitor-web
+cd monitor-web
 python start.py
 ```
 
-> **Nota:** Esta función te servirá para instalar cualquier otra herramienta futura de XONIDU (por ejemplo `xoninstall xoniran`).
+> La misma funcion permite instalar futuras herramientas de XONIDU, por ejemplo `xoninstall xoniran`.
 
-### Para Windows
+### Windows
 
-#### Opción 1 – Clonado manual (PowerShell o CMD)
+**Metodo 1: clonado manual (PowerShell o CMD)**
 
 ```cmd
-git clone https://github.com/XONIDU/xonicli.git
-cd xonicli
-pip install -r requirements.txt
+git clone https://github.com/XONIDU/monitor-web.git
+cd monitor-web
 python start.py
 ```
 
-#### Opción 2 – Usar `xonicli.bat` (con permisos de administrador)
+**Metodo 2: lanzador `monitor_web.bat`**
 
-Descarga o crea el archivo `xonicli.bat` en el mismo directorio con el siguiente contenido:
+Crea el archivo `monitor_web.bat` en el mismo directorio del proyecto:
 
 ```batch
 @echo off
-title XONICLI 2026 - Sistema Meteorologico en Terminal
+title MONITOR WEB 2026 - Lanzador
 color 0A
 
-:: ============================================================
-:: IR AL DIRECTORIO DONDE ESTA EL SCRIPT .BAT
-:: ============================================================
-cd /d "%~dp0"
-
-:: ============================================================
-:: VERIFICAR QUE start.py EXISTE
-:: ============================================================
-if not exist "%~dp0start.py" (
-    echo [ERROR] No se encuentra start.py en esta carpeta
-    echo.
-    echo Ruta actual: %~dp0
-    echo.
-    echo Asegurate de que start.py esta en la misma carpeta que este .bat
-    echo.
-    pause
-    exit /B
-)
-
-:: ============================================================
-:: SOLICITAR PERMISOS DE ADMINISTRADOR (OPCIONAL, PERO RECOMENDADO)
-:: ============================================================
 net session >nul 2>&1
 if %errorlevel% neq 0 (
     echo Solicitando permisos de administrador...
@@ -106,30 +115,27 @@ if %errorlevel% neq 0 (
     exit /B
 )
 
-:: ============================================================
-:: EJECUTAR start.py
-:: ============================================================
+cd /d "%~dp0"
+
+if not exist "%~dp0start.py" (
+    echo [ERROR] No se encuentra start.py en esta carpeta
+    echo.
+    pause
+    exit /B
+)
+
 cls
 echo ============================================================
-echo           XONICLI 2026 - Sistema Meteorologico
+echo           MONITOR WEB 2026 - Lanzador
 echo ============================================================
+echo.
+echo [OK] Permisos de administrador obtenidos
 echo.
 echo [INFO] Directorio de trabajo: %~dp0
 echo.
-echo Iniciando XONICLI...
+echo Iniciando MONITOR WEB...
 echo.
-echo [INFO] Cliente meteorologico con animacion de la Tierra
-echo [INFO] Fuente de datos: wttr.in
-echo [INFO] Ubicaciones: %USERPROFILE%\.xonichat\ubicaciones.txt
-echo [INFO] Cache de datos: %USERPROFILE%\.xonichat\weather_cache.json
-echo.
-echo [CARACTERISTICAS]
-echo   - Tierra ASCII girando en tiempo real
-echo   - Secuencia: hoy -> manana -> pasado manana
-echo   - Dos modos: recurrente (bucle) o unica consulta
-echo.
-echo [COMANDOS]
-echo   Presiona Ctrl+C para salir en cualquier momento
+echo [INFO] Podras elegir entre UI (grafica) o CLI (terminal)
 echo.
 echo ============================================================
 echo.
@@ -138,38 +144,62 @@ python start.py
 
 if %errorlevel% neq 0 (
     echo.
-    echo [ERROR] Ocurrio un error al ejecutar XONICLI
-    echo.
-    echo Verifica que todos los archivos necesarios esten presentes
-    echo y que Python este instalado correctamente.
+    echo [ERROR] Ocurrio un error al ejecutar MONITOR WEB
     echo.
 )
 
 pause
 ```
 
-Haz doble clic en `xonicli.bat` para ejecutar XONICLI con permisos de administrador en Windows.
+Haz doble clic en `monitor_web.bat` para ejecutar el lanzador con permisos de administrador.
 
 ---
 
-## 🔧 Configuración
+## Uso
 
-La primera vez que ejecutes `start.py` se abrirá un gestor interactivo donde podrás:
+### Linux/macOS
 
-- Elegir el color del texto (0‑9)
-- Agregar una o varias ubicaciones (código postal + país)
-- Seleccionar el modo de ejecución
-
-### Archivo de ubicaciones (manual)
-
-Si prefieres editar directamente el archivo, se encuentra en:
-
-```
-~/.xonichat/ubicaciones.txt   (Linux/macOS)
-%USERPROFILE%\.xonichat\ubicaciones.txt   (Windows)
+```bash
+python start.py
 ```
 
-Formato (una ubicación por línea, **código postal** y **país** separados por espacio):
+### Windows
+
+- Opcion 1: `python start.py` desde CMD o PowerShell
+- Opcion 2: doble clic en `monitor_web.bat`
+
+### Eleccion de modo
+
+Al iniciar, `start.py` pregunta:
+
+```
+Selecciona el modo de ejecucion:
+  1. UI  - Interfaz grafica (paneles web)
+  2. CLI - Solo terminal y temperaturas
+Elige (1/2) [1]:
+```
+
+- **UI**: se abre una ventana con los paneles web configurados.
+- **CLI**: se inicia el monitor meteorologico con la Tierra animada.
+
+---
+
+## Configuracion
+
+### Modo CLI — Clima
+
+En la primera ejecucion se solicita:
+
+1. Color del texto (0-9)
+2. Una o varias ubicaciones (codigo postal + pais)
+3. Modo de ejecucion (recurrente o unica vez; ambos en bucle infinito)
+
+**Archivo de ubicaciones** (editable manualmente):
+
+- Linux/macOS: `~/.xonichat/ubicaciones.txt`
+- Windows: `%USERPROFILE%\.xonichat\ubicaciones.txt`
+
+Formato: una ubicacion por linea, con codigo postal y pais separados por espacio.
 
 ```
 28001 ES
@@ -177,98 +207,89 @@ Formato (una ubicación por línea, **código postal** y **país** separados por
 75001 FR
 ```
 
-### Caché de datos meteorológicos
+**Cache de datos**: `~/.xonichat/weather_cache.json`  
+Solo se descarga una vez; luego se reutiliza sin conexion.
 
-Los datos se guardan en `~/.xonichat/weather_cache.json`.  
-Solo se descargan una vez (la primera ejecución). En ejecuciones posteriores se usan los datos guardados, ahorrando ancho de banda y permitiendo funcionar sin internet.
+### Modo UI — Paneles web
 
----
+La configuracion se guarda en:
 
-## 🚀 Uso
+- Linux/macOS: `~/.config/monitor-web/config.json`
+- Windows: `%USERPROFILE%\.config\monitor-web\config.json`
 
-### Linux/macOS:
-```bash
-python start.py
-```
+Incluye:
 
-### Windows:
-- Opción 1: `python start.py` (CMD o PowerShell)
-- Opción 2: Doble clic en `xonicli.bat`
+- Numero de columnas (0 = automatico)
+- Lista de sitios: titulo, URL y minutos de refresco
 
-Dentro del programa:
+Los paneles se gestionan desde la barra de herramientas y los botones de cada panel:
 
-- El programa mostrará la Tierra girando junto a la información climática.
-- Cada 10 segundos avanzará automáticamente al siguiente día (hoy → mañana → pasado mañana) y luego a la siguiente ubicación.
-- En **modo recurrente** el ciclo se repite infinitamente.
-- En **modo consulta única** también se repite infinitamente (ambos modos son ahora bucle infinito).
-- Presiona `Ctrl+C` en cualquier momento para salir.
+| Boton | Accion |
+|-------|--------|
+| R | Recargar |
+| T | Configurar refresco automatico |
+| E | Editar titulo / URL |
+| M | Maximizar / restaurar |
+| X | Quitar panel |
 
-### Ejemplo de pantalla
+Atajos globales:
 
-```
-============================================================
-   XONICLI - SISTEMA METEOROLOGICO CON TIERRA ANIMADA
-============================================================
-   Fuente: wttr.in | Sin emojis | Cache local
-   La Tierra gira en tiempo real junto a los datos
-============================================================
-
- (Aquí aparece la Tierra ASCII girando a la izquierda)
- (A la derecha o debajo se ven los datos climáticos)
-```
+- `Ctrl+N`: agregar nueva web
+- `F5`: recargar todos los paneles
+- `F11`: pantalla completa
 
 ---
 
-## 📁 Estructura del paquete
+## Estructura del proyecto
 
-| Archivo | Ubicación |
-|---------|-----------|
-| `xonicli.py` (programa principal) | Directorio del proyecto |
-| `start.py` (lanzador) | Directorio del proyecto |
-| `xonicli.bat` (lanzador Windows) | Directorio del proyecto |
-| `ubicaciones.txt` | `~/.xonichat/` (Linux) o `%USERPROFILE%\.xonichat\` (Windows) |
-| `weather_cache.json` | `~/.xonichat/` (Linux) o `%USERPROFILE%\.xonichat\` (Windows) |
-
----
-
-## 🧪 Pruebas
-
-Ejecuta directamente el script principal:
-
-```bash
-python xonicli.py
-```
-
-Si todo funciona correctamente, verás la animación de la Tierra y los datos del clima.
+| Archivo | Descripcion |
+|---------|-------------|
+| `start.py` | Lanzador universal; elige UI o CLI e instala dependencias |
+| `monitor_ui.py` | Modo UI: paneles web en cuadricula |
+| `monitor_cli.py` | Modo CLI: clima con animacion ASCII de la Tierra |
+| `monitor_web.bat` | Lanzador para Windows (opcional) |
+| `ubicaciones.txt` | `~/.xonichat/ubicaciones.txt` (CLI) |
+| `weather_cache.json` | `~/.xonichat/weather_cache.json` (CLI) |
+| `config.json` | `~/.config/monitor-web/config.json` (UI) |
 
 ---
 
-## 🐛 Problemas comunes y soluciones
+## Pruebas
 
-| Problema | Solución |
+- CLI: `python monitor_cli.py`
+- UI: `python monitor_ui.py`
+
+Si ambos modos se ejecutan correctamente, la instalacion esta completa.
+
+---
+
+## Solucion de problemas
+
+| Problema | Solucion |
 |----------|----------|
-| `No module 'requests'` | `pip install requests` (o `pip3 install requests`) |
-| Error `expected a nonnegative input` | Ya corregido en la última versión. Asegúrate de tener la versión más reciente. |
-| La animación parpadea | Aumenta el tamaño de la terminal (mínimo 80x24). |
-| No se ven datos | En la primera ejecución se necesita internet. Luego ya funciona sin conexión. |
-| `Permission denied` al ejecutar (Linux) | Usa `python start.py` en lugar de `./` o da permisos con `chmod +x start.py` |
-| Error de permisos en Windows | Usa `xonicli.bat` que ejecuta con permisos de administrador |
+| `No module named 'requests'` | `pip install requests beautifulsoup4` |
+| `No module named 'PyQt6'` | `pip install PyQt6 PyQt6-WebEngine` |
+| La animacion parpadea | Aumenta el tamano de la terminal (minimo 80x24) |
+| No se muestran datos (CLI) | La primera ejecucion requiere conexion a internet |
+| `Permission denied` en Linux | Ejecuta `python start.py` o aplica `chmod +x start.py` |
+| Problemas de permisos en Windows | Usa `monitor_web.bat` |
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 **© 2026 Darian Alberto Camacho Salas (XONIDU)**  
-Todos los derechos reservados. No se permite la copia, distribución o modificación sin autorización explícita.
+Todos los derechos reservados. No se permite la copia, distribucion ni modificacion sin autorizacion expresa del autor.
 
 ---
 
-## ✉️ Contacto
+## Contacto
 
-- **Creador**: Darian Alberto Camacho Salas  
-- **Email**: xonidu@gmail.com  
-- **GitHub**: [@XONIDU](https://github.com/XONIDU)
+- **Autor:** Darian Alberto Camacho Salas
+- **Correo:** xonidu@gmail.com
+- **GitHub:** [@XONIDU](https://github.com/XONIDU)
 
 ---
 
-*Hecho con 🌍 y código para los amantes de la terminal.*
+*Herramienta multiuso de terminal y escritorio para entusiastas de la meteorologia y la monitorizacion web.*
+```

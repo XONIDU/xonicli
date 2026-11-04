@@ -1,5 +1,18 @@
-subprocess
-sys
-platform
-shutil
-pathlib
+# ============================================================
+# MONITOR WEB 2026 - Requisitos completos (CLI + UI)
+# ============================================================
+# Instala con: pip install -r requirements.txt
+#
+# Si usas Arch Linux o Fedora y pip se queja de "externally-managed-environment",
+# usa: pip install -r requirements.txt --break-system-packages
+#
+# Si usas Debian/Ubuntu, puedes usar: pip install --user -r requirements.txt
+# ============================================================
+
+# --- Dependencias para el modo CLI (clima en terminal) ---
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+
+# --- Dependencias para el modo UI (paneles web) ---
+PyQt6>=6.5.0
+PyQt6-WebEngine>=6.5.0
