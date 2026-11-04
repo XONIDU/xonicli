@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-XONICLI 2026 - Lanzador Universal con Gestor de Ubicaciones
-Sistema Meteorológico en Terminal con animación de la Tierra
+MONITOR WEB 2026 - Lanzador Universal
+Permite elegir entre interfaz grafica (UI) o terminal (CLI).
+Verifica dependencias, instala PyQt6 y requests segun sea necesario.
+Compatible con Windows, Linux (varias distros) y macOS.
 Desarrollador: Darian Alberto Camacho Salas
-Organización: XONIDU
+Organizacion: XONIDU
 """
 
 import subprocess
@@ -14,7 +16,6 @@ import os
 import platform
 import shutil
 import time
-from pathlib import Path
 
 # ============================================================================
 # Colores para terminal
@@ -27,7 +28,7 @@ class Colors:
     CYAN = '\033[96m'
     END = '\033[0m'
     BOLD = '\033[1m'
-    
+
     @staticmethod
     def supports_color():
         if platform.system() == 'Windows':
@@ -35,7 +36,7 @@ class Colors:
                 import ctypes
                 kernel32 = ctypes.windll.kernel32
                 return kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
-            except:
+            except Exception:
                 return False
         return True
 
@@ -45,7 +46,7 @@ if not Colors.supports_color():
             setattr(Colors, attr, '')
 
 # ============================================================================
-# Detección del sistema
+# Deteccion del sistema
 # ============================================================================
 def get_system():
     return platform.system().lower()
@@ -57,13 +58,13 @@ def get_linux_distro():
         if os.path.exists('/etc/os-release'):
             with open('/etc/os-release', 'r') as f:
                 content = f.read().lower()
-                if 'ubuntu' in content or 'debian' in content or 'mint' in content or 'antix' in content:
+                if any(x in content for x in ['ubuntu', 'debian', 'mint', 'antix', 'pop!_os']):
                     return 'debian-based'
-                elif 'arch' in content or 'manjaro' in content:
+                elif any(x in content for x in ['arch', 'manjaro', 'endeavouros']):
                     return 'arch-based'
                 elif 'fedora' in content:
                     return 'fedora'
-                elif 'centos' in content or 'rhel' in content:
+                elif any(x in content for x in ['centos', 'rhel', 'rocky', 'almalinux']):
                     return 'centos'
                 elif 'opensuse' in content:
                     return 'opensuse'
@@ -78,18 +79,17 @@ def get_linux_distro():
         elif shutil.which('zypper'):
             return 'opensuse'
         return 'linux-generico'
-    except:
+    except Exception:
         return 'linux-generico'
 
 def get_python_command():
     if get_system() == 'windows':
         return ['python']
-    else:
-        try:
-            subprocess.run(['python3', '--version'], capture_output=True, check=True)
-            return ['python3']
-        except:
-            return ['python']
+    try:
+        subprocess.run(['python3', '--version'], capture_output=True, check=True)
+        return ['python3']
+    except Exception:
+        return ['python']
 
 def get_pip_command():
     return [sys.executable, '-m', 'pip']
@@ -110,20 +110,23 @@ def get_install_flags():
 def get_script_dir():
     return os.path.dirname(os.path.abspath(__file__))
 
-def get_xonicli_path():
-    """Detecta la ruta de xonicli.py en múltiples ubicaciones"""
+def get_script_path(name):
+    """Busca un script en el directorio actual o rutas comunes."""
     script_dir = get_script_dir()
     rutas = [
-        os.path.join(script_dir, 'xonicli.py'),
-        '/usr/share/xonicli/xonicli.py',
-        os.path.join(os.path.expanduser("~"), '.xonichat', 'xonicli.py'),
-        os.path.join(os.getcwd(), 'xonicli.py')
+        os.path.join(script_dir, name),
+        f'/usr/share/monitor-web/{name}',
+        os.path.join(os.path.expanduser("~"), '.monitor-web', name),
+        os.path.join(os.getcwd(), name),
     ]
     for r in rutas:
         if os.path.exists(r):
             return r
     return None
 
+# ============================================================================
+# Banner
+# ============================================================================
 def print_banner():
     sistema = get_system()
     distro = get_linux_distro()
@@ -132,152 +135,55 @@ def print_banner():
         'linux': f'LINUX ({distro.upper()})' if distro else 'LINUX',
         'darwin': 'MACOS'
     }.get(sistema, 'DESCONOCIDO')
-    
+
     banner = f"""
-{Colors.PURPLE}{Colors.BOLD}╔══════════════════════════════════════════════════════════╗
-║                    XONICLI 2026 v1.0                         ║
-║              Sistema Meteorológico en Terminal                ║
-║                   Optimizado para 1GB RAM                     ║
-║                Con animación ASCII de la Tierra               ║
-║                                                            ║
-║               Sistema detectado: {sistema_texto:<27} ║
-║                                                            ║
-║               Desarrollado por: Darian Alberto             ║
-║                      Camacho Salas                         ║
-║                      Organización: XONIDU                  ║
-╚══════════════════════════════════════════════════════════════╝{Colors.END}
+{Colors.PURPLE}{Colors.BOLD}============================================================
+                  MONITOR WEB 2026
+            Visualiza varias webs a la vez
+                   Optimizado para 1GB RAM
+
+               Sistema detectado: {sistema_texto:<27}
+               Desarrollado por: Darian Alberto
+                      Camacho Salas
+                      Organizacion: XONIDU
+============================================================{Colors.END}
     """
     print(banner)
 
 def mostrar_ayuda():
     ayuda = f"""
-{Colors.BOLD}USO DE XONICLI:{Colors.END}
+{Colors.BOLD}USO DE MONITOR WEB:{Colors.END}
 
-  xonicli
+  python start.py
 
-{Colors.BOLD}CARACTERISTICAS:{Colors.END}
+{Colors.BOLD}MODOS DISPONIBLES:{Colors.END}
 
-  ✅ Interfaz 100% terminal con Tierra animada
-  ✅ Múltiples ubicaciones (país + código postal)
-  ✅ Datos en caché (solo una descarga por internet)
-  ✅ Secuencia automática: hoy, mañana, pasado mañana
-  ✅ Dos modos: recurrente (bucle) o única consulta
+  1. UI  - Interfaz grafica con paneles web (requiere PyQt6)
+  2. CLI - Solo terminal, muestra temperaturas
 
-{Colors.BOLD}COMANDOS DENTRO DEL PROGRAMA:{Colors.END}
+{Colors.BOLD}CONTROLES EN UI:{Colors.END}
+
+  Ctrl+N     - Agregar nueva web
+  F5         - Recargar todos los paneles
+  F11        - Pantalla completa
+  Botones de cada panel: recargar, refresco, editar, maximizar, cerrar
+
+{Colors.BOLD}CONTROLES EN CLI:{Colors.END}
 
   Ctrl+C     - Salir del programa
-
-{Colors.BOLD}OBTENER CÓDIGOS POSTALES:{Colors.END}
-
-  Introduce el código postal de tu ciudad.
-  Ejemplo: 28001 (Madrid, España), 55660 (México)
+  Las webs se muestran en secuencia, refrescandose cada 30 segundos
     """
     print(ayuda)
 
 # ============================================================================
-# Gestión de ubicaciones (similar a gestión de keys)
-# ============================================================================
-def get_ubicaciones_path():
-    """Devuelve la ruta del archivo de ubicaciones"""
-    home_ubic = os.path.join(os.path.expanduser("~"), '.xonichat', 'ubicaciones.txt')
-    return home_ubic
-
-def gestionar_ubicaciones():
-    """Gestión interactiva de ubicaciones (país + código postal)"""
-    ubic_path = get_ubicaciones_path()
-    ubic_dir = os.path.dirname(ubic_path)
-    
-    if not os.path.exists(ubic_dir):
-        os.makedirs(ubic_dir, exist_ok=True)
-    
-    if not os.path.exists(ubic_path):
-        with open(ubic_path, 'w') as f:
-            f.write("# Archivo de ubicaciones para XONICLI\n")
-            f.write("# Formato: CODIGO_POSTAL PAIS (ej: 28001 ES)\n")
-            f.write("# Cada línea una ubicación\n\n")
-            f.write("# Ejemplo:\n")
-            f.write("# 28001 ES\n")
-            f.write("# 55660 MX\n")
-    
-    # Leer ubicaciones actuales
-    ubicaciones = []
-    with open(ubic_path, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                partes = line.split()
-                if len(partes) >= 2:
-                    cp = partes[0]
-                    pais = partes[1].upper()
-                    ubicaciones.append((cp, pais))
-    
-    print(f"\n{Colors.CYAN}{Colors.BOLD}=== GESTOR DE UBICACIONES ==={Colors.END}")
-    print(f"📁 Archivo: {ubic_path}")
-    print(f"📍 Ubicaciones activas: {len(ubicaciones)}")
-    
-    if ubicaciones:
-        print(f"\n{Colors.BOLD}Ubicaciones actuales:{Colors.END}")
-        for i, (cp, pais) in enumerate(ubicaciones, 1):
-            print(f"  {i}. {cp} ({pais})")
-    
-    print(f"\n{Colors.BOLD}Opciones:{Colors.END}")
-    print("  1. Agregar nueva ubicación")
-    print("  2. Eliminar una ubicación")
-    print("  3. Salir (continuar con las ubicaciones actuales)")
-    
-    opcion = input(f"\n{Colors.YELLOW}Elige una opción (1-3): {Colors.END}").strip()
-    
-    if opcion == '1':
-        cp = input(f"{Colors.CYAN}Código postal: {Colors.END}").strip()
-        pais = input(f"{Colors.CYAN}Código de país (ES, MX, AR, etc.): {Colors.END}").strip().upper()
-        if cp and pais:
-            with open(ubic_path, 'a') as f:
-                f.write(f"{cp} {pais}\n")
-            print(f"{Colors.GREEN}✅ Ubicación agregada correctamente{Colors.END}")
-            time.sleep(1)
-        else:
-            print(f"{Colors.RED}❌ Datos inválidos{Colors.END}")
-            time.sleep(1)
-    
-    elif opcion == '2':
-        if not ubicaciones:
-            print(f"{Colors.YELLOW}⚠️ No hay ubicaciones para eliminar{Colors.END}")
-            time.sleep(1)
-        else:
-            print(f"\n{Colors.BOLD}Selecciona la ubicación a eliminar:{Colors.END}")
-            for i, (cp, pais) in enumerate(ubicaciones, 1):
-                print(f"  {i}. {cp} ({pais})")
-            try:
-                eliminar = int(input(f"{Colors.YELLOW}Número a eliminar (0 = cancelar): {Colors.END}"))
-                if 1 <= eliminar <= len(ubicaciones):
-                    ubicaciones.pop(eliminar - 1)
-                    with open(ubic_path, 'w') as f:
-                        f.write("# Archivo de ubicaciones para XONICLI\n")
-                        f.write("# Formato: CODIGO_POSTAL PAIS (ej: 28001 ES)\n")
-                        f.write("# Cada línea una ubicación\n\n")
-                        for cp, pais in ubicaciones:
-                            f.write(f"{cp} {pais}\n")
-                    print(f"{Colors.GREEN}✅ Ubicación eliminada correctamente{Colors.END}")
-                    time.sleep(1)
-                elif eliminar == 0:
-                    print(f"{Colors.YELLOW}Operación cancelada{Colors.END}")
-                else:
-                    print(f"{Colors.RED}❌ Número inválido{Colors.END}")
-            except ValueError:
-                print(f"{Colors.RED}❌ Entrada inválida{Colors.END}")
-    
-    print(f"{Colors.GREEN}✅ Continuando con {len(ubicaciones)} ubicación(es)...{Colors.END}")
-    return ubic_path
-
-# ============================================================================
-# Verificación de dependencias (similar a XONICHAT)
+# Verificacion e instalacion de dependencias
 # ============================================================================
 def check_python():
     try:
         cmd = get_python_command() + ['--version']
         subprocess.run(cmd, capture_output=True, check=True)
         return True
-    except:
+    except Exception:
         return False
 
 def check_pip():
@@ -285,7 +191,7 @@ def check_pip():
         cmd = get_pip_command() + ['--version']
         subprocess.run(cmd, capture_output=True, check=True)
         return True
-    except:
+    except Exception:
         return False
 
 def install_pip_linux():
@@ -296,13 +202,31 @@ def install_pip_linux():
             subprocess.run(['sudo', 'apt', 'update'], check=False)
             subprocess.run(['sudo', 'apt', 'install', '-y', 'python3-pip'], check=True)
             return True
-        except:
+        except Exception:
             return False
     elif distro == 'arch-based':
         try:
             subprocess.run(['sudo', 'pacman', '-S', '--noconfirm', 'python-pip'], check=True)
             return True
-        except:
+        except Exception:
+            return False
+    elif distro == 'fedora':
+        try:
+            subprocess.run(['sudo', 'dnf', 'install', '-y', 'python3-pip'], check=True)
+            return True
+        except Exception:
+            return False
+    elif distro == 'centos':
+        try:
+            subprocess.run(['sudo', 'yum', 'install', '-y', 'python3-pip'], check=True)
+            return True
+        except Exception:
+            return False
+    elif distro == 'opensuse':
+        try:
+            subprocess.run(['sudo', 'zypper', 'install', '-y', 'python3-pip'], check=True)
+            return True
+        except Exception:
             return False
     return False
 
@@ -311,61 +235,88 @@ def install_pip_windows():
     try:
         subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'], check=True)
         return True
-    except:
+    except Exception:
         return False
 
-def check_requests():
+def check_module(name):
     try:
-        __import__('requests')
+        __import__(name)
         return True
     except ImportError:
         return False
 
-def install_requests():
-    print(f"{Colors.YELLOW}Instalando requests...{Colors.END}")
+def install_packages(packages):
+    """Instala una lista de paquetes con pip, probando flags."""
     if not check_pip():
         return False
     flags = get_install_flags()
     try:
-        cmd = get_pip_command() + ['install', 'requests'] + flags
-        subprocess.run(cmd, check=True, capture_output=True)
-        print(f"{Colors.GREEN}requests instalado correctamente.{Colors.END}")
+        cmd = get_pip_command() + ['install'] + packages + flags
+        subprocess.run(cmd, check=True)
         return True
-    except:
-        try:
-            cmd = get_pip_command() + ['install', 'requests']
-            subprocess.run(cmd, check=True)
-            print(f"{Colors.GREEN}requests instalado correctamente.{Colors.END}")
-            return True
-        except:
-            return False
+    except Exception:
+        pass
+    try:
+        cmd = get_pip_command() + ['install'] + packages
+        subprocess.run(cmd, check=True)
+        return True
+    except Exception:
+        return False
+
+def ensure_ui_dependencies():
+    """Verifica e instala PyQt6 y PyQt6-WebEngine."""
+    if check_module('PyQt6.QtWidgets') and check_module('PyQt6.QtWebEngineWidgets'):
+        print(f"{Colors.GREEN}[OK] PyQt6 disponible{Colors.END}")
+        return True
+    print(f"{Colors.YELLOW}[WARN] PyQt6 no encontrado. Instalando...{Colors.END}")
+    ok = install_packages(['PyQt6', 'PyQt6-WebEngine'])
+    if ok:
+        print(f"{Colors.GREEN}PyQt6 instalado correctamente.{Colors.END}")
+    return ok
+
+def ensure_cli_dependencies():
+    """Verifica e instala requests y beautifulsoup4."""
+    need = []
+    if not check_module('requests'):
+        need.append('requests')
+    if not check_module('bs4'):
+        need.append('beautifulsoup4')
+    if not need:
+        print(f"{Colors.GREEN}[OK] Dependencias CLI disponibles{Colors.END}")
+        return True
+    print(f"{Colors.YELLOW}[WARN] Faltan dependencias CLI: {', '.join(need)}. Instalando...{Colors.END}")
+    ok = install_packages(need)
+    if ok:
+        print(f"{Colors.GREEN}Dependencias CLI instaladas.{Colors.END}")
+    return ok
 
 # ============================================================================
-# Función principal
+# Funcion principal
 # ============================================================================
 def main():
     if get_system() == 'windows':
         os.system('cls')
     else:
         os.system('clear')
-    
+
     print_banner()
-    
+
     if len(sys.argv) > 1 and sys.argv[1] in ['-h', '--help', '/?']:
         mostrar_ayuda()
         if get_system() != 'windows':
             input(f"\n{Colors.YELLOW}Presiona Enter para salir...{Colors.END}")
         return
-    
+
     if not check_python():
-        print(f"\n{Colors.RED}❌ Python no está instalado{Colors.END}")
+        print(f"\n{Colors.RED}[ERROR] Python no esta instalado{Colors.END}")
         sys.exit(1)
-    
-    ver_py = subprocess.run(get_python_command() + ['--version'], capture_output=True, text=True).stdout.strip()
+
+    ver_py = subprocess.run(get_python_command() + ['--version'],
+                            capture_output=True, text=True).stdout.strip()
     print(f"{Colors.BOLD}Python:{Colors.END} {ver_py}")
-    
+
     if not check_pip():
-        print(f"\n{Colors.YELLOW}⚠️ Pip no encontrado. Instalando...{Colors.END}")
+        print(f"\n{Colors.YELLOW}[WARN] Pip no encontrado. Instalando...{Colors.END}")
         sistema = get_system()
         if sistema == 'linux':
             if not install_pip_linux():
@@ -375,45 +326,60 @@ def main():
             if not install_pip_windows():
                 print(f"{Colors.RED}No se pudo instalar pip.{Colors.END}")
                 sys.exit(1)
-    else:
-        print(f"{Colors.GREEN}✓ Pip disponible{Colors.END}")
-    
-    if not check_requests():
-        print(f"\n{Colors.YELLOW}⚠️ requests no encontrado. Instalando...{Colors.END}")
-        if not install_requests():
-            print(f"{Colors.RED}No se pudo instalar requests.{Colors.END}")
+        else:
+            print(f"{Colors.RED}Instala pip manualmente para {sistema}.{Colors.END}")
             sys.exit(1)
     else:
-        print(f"{Colors.GREEN}✓ requests disponible{Colors.END}")
-    
-    # Gestionar ubicaciones
-    gestionar_ubicaciones()
-    
-    # Buscar el script principal xonicli.py
-    ruta_xonicli = get_xonicli_path()
-    if not ruta_xonicli:
-        print(f"\n{Colors.RED}❌ No se encuentra xonicli.py{Colors.END}")
-        print(f"{Colors.YELLOW}Asegúrate de que xonicli.py esté en el mismo directorio que este lanzador.{Colors.END}")
-        sys.exit(1)
-    
-    xonicli_dir = os.path.dirname(ruta_xonicli)
-    print(f"{Colors.GREEN}✓ xonicli.py encontrado en: {xonicli_dir}{Colors.END}")
-    
-    # Cambiar al directorio y ejecutar
-    os.chdir(xonicli_dir)
-    print(f"\n{Colors.BOLD}Iniciando XONICLI...{Colors.END}")
-    print(f"{Colors.CYAN}Para salir: presiona Ctrl+C en cualquier momento{Colors.END}")
-    print("-"*50)
-    
-    try:
-        python_cmd = get_python_command()
-        subprocess.run(python_cmd + [ruta_xonicli])
-    except KeyboardInterrupt:
-        print(f"\n{Colors.YELLOW}Programa detenido por el usuario.{Colors.END}")
-    except Exception as e:
-        print(f"\n{Colors.RED}❌ Error: {e}{Colors.END}")
-    
-    print(f"\n{Colors.GREEN}Gracias por usar XONICLI{Colors.END}")
+        print(f"{Colors.GREEN}[OK] Pip disponible{Colors.END}")
+
+    # Elegir modo
+    print(f"\n{Colors.BOLD}Selecciona el modo de ejecucion:{Colors.END}")
+    print("  1. UI  - Interfaz grafica (paneles web)")
+    print("  2. CLI - Solo terminal y temperaturas")
+    opcion = input(f"{Colors.YELLOW}Elige (1/2) [1]: {Colors.END}").strip() or "1"
+
+    if opcion == "1":
+        # Modo UI
+        if not ensure_ui_dependencies():
+            print(f"{Colors.RED}No se pudieron instalar las dependencias de UI.{Colors.END}")
+            sys.exit(1)
+        ruta = get_script_path('monitor_ui.py')
+        if not ruta:
+            print(f"{Colors.RED}[ERROR] No se encuentra monitor_ui.py{Colors.END}")
+            sys.exit(1)
+        print(f"{Colors.GREEN}[OK] monitor_ui.py encontrado en: {os.path.dirname(ruta)}{Colors.END}")
+        os.chdir(os.path.dirname(ruta))
+        print(f"\n{Colors.BOLD}Iniciando MONITOR WEB (UI)...{Colors.END}")
+        print(f"{Colors.CYAN}Para salir: cierra la ventana o Ctrl+C{Colors.END}")
+        print("-" * 50)
+        try:
+            subprocess.run(get_python_command() + [ruta])
+        except KeyboardInterrupt:
+            print(f"\n{Colors.YELLOW}Programa detenido por el usuario.{Colors.END}")
+        except Exception as e:
+            print(f"\n{Colors.RED}Error: {e}{Colors.END}")
+    else:
+        # Modo CLI
+        if not ensure_cli_dependencies():
+            print(f"{Colors.RED}No se pudieron instalar las dependencias CLI.{Colors.END}")
+            sys.exit(1)
+        ruta = get_script_path('monitor_cli.py')
+        if not ruta:
+            print(f"{Colors.RED}[ERROR] No se encuentra monitor_cli.py{Colors.END}")
+            sys.exit(1)
+        print(f"{Colors.GREEN}[OK] monitor_cli.py encontrado en: {os.path.dirname(ruta)}{Colors.END}")
+        os.chdir(os.path.dirname(ruta))
+        print(f"\n{Colors.BOLD}Iniciando MONITOR WEB (CLI)...{Colors.END}")
+        print(f"{Colors.CYAN}Para salir: Ctrl+C{Colors.END}")
+        print("-" * 50)
+        try:
+            subprocess.run(get_python_command() + [ruta])
+        except KeyboardInterrupt:
+            print(f"\n{Colors.YELLOW}Programa detenido por el usuario.{Colors.END}")
+        except Exception as e:
+            print(f"\n{Colors.RED}Error: {e}{Colors.END}")
+
+    print(f"\n{Colors.GREEN}Gracias por usar MONITOR WEB{Colors.END}")
     if get_system() != 'windows':
         input(f"{Colors.YELLOW}Presiona Enter para salir...{Colors.END}")
 
