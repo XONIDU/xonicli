@@ -1,4 +1,4 @@
-```markdown
+
 # MONITOR WEB
 
 **Monitor multiuso de terminal y escritorio: clima con animacion ASCII o paneles web en cuadricula**  
@@ -292,4 +292,3 @@ Todos los derechos reservados. No se permite la copia, distribucion ni modificac
 ---
 
 *Herramienta multiuso de terminal y escritorio para entusiastas de la meteorologia y la monitorizacion web.*
-```
